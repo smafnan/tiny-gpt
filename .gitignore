@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Trained weights (regenerate with `python train.py`)
+reports/model.pt
+# PowerShell redirect log (UTF-16); the sample/metrics/figure are committed instead
+reports/train_log.txt
+
+# The corpus (data/input.txt) and report figures/sample ARE committed.

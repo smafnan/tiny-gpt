@@ -1,0 +1,14 @@
+{
+  "params": 809856,
+  "vocab_size": 65,
+  "steps": 2500,
+  "final_val_loss": 1.8623356819152832,
+  "config": {
+    "vocab_size": 65,
+    "block_size": 64,
+    "n_layer": 4,
+    "n_head": 4,
+    "n_embd": 128,
+    "dropout": 0.1
+  }
+}
