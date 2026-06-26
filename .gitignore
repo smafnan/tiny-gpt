@@ -18,4 +18,10 @@ reports/model.pt
 # PowerShell redirect log (UTF-16); the sample/metrics/figure are committed instead
 reports/train_log.txt
 
-# The corpus (data/input.txt) and report figures/sample ARE committed.
+# Frontend deps + build log
+web/node_modules/
+web/.vite/
+web_build.log
+
+# The corpus (data/input.txt), report figures/sample, and web_model/gpt.pt
+# (the committed weights for the web playground) ARE committed.

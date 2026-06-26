@@ -19,6 +19,25 @@ pytest -q                           # 8 tests, incl. causal-masking verification
 
 ---
 
+## 🖥️ Web playground (React + Tailwind + FastAPI)
+
+A literary text-generation playground ships with the project: give the model a
+seed (e.g. `ROMEO:`), tune temperature / length / top-k, and watch it dream up new
+Shakespeare-ish lines with a typewriter reveal. It loads a small committed
+checkpoint (`web_model/gpt.pt`) so there's no training at request time.
+
+```bash
+pip install -e ".[web]"
+uvicorn api:app --reload          # open http://localhost:8000
+
+# (Re)build the checkpoint and frontend if you want:
+python build_web_model.py         # trains a compact model -> web_model/gpt.pt
+cd web && npm install && npm run build
+```
+
+The committed `web/dist` + `web_model/gpt.pt` mean `uvicorn api:app` works from a
+clone with no build or training.
+
 ## Self-attention without the word "magic"
 
 For every token, three vectors are produced by linear projection:
