@@ -35,7 +35,7 @@ def _load():
     global _model, _tok, _cfg
     if _model is not None or not BUNDLE.exists():
         return
-    bundle = torch.load(BUNDLE, map_location="cpu")
+    bundle = torch.load(BUNDLE, map_location="cpu", weights_only=True)
     _cfg = GPTConfig(**bundle["config"])
     _tok = CharTokenizer(bundle["chars"])      # same sorted vocab as training
     _model = GPT(_cfg)

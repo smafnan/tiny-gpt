@@ -1,0 +1,12 @@
+# Core dependencies (mirrors [project.dependencies] in pyproject.toml, which
+# remains the source of truth — install with `pip install -e .` for normal use).
+torch>=2.1
+numpy>=1.24
+matplotlib>=3.7
+
+# Optional: web playground (api.py) -- pip install -e ".[web]"
+fastapi>=0.110
+uvicorn[standard]>=0.27
+
+# Optional: tests -- pip install -e ".[dev]"
+pytest>=7.4

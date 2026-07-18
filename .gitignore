@@ -22,6 +22,7 @@ reports/train_log.txt
 web/node_modules/
 web/.vite/
 web_build.log
+*.tsbuildinfo
 
 # The corpus (data/input.txt), report figures/sample, and web_model/gpt.pt
 # (the committed weights for the web playground) ARE committed.
