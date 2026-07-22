@@ -76,7 +76,7 @@ pip install -e ".[dev]"
 
 python train.py --steps 2500 --block-size 64   # the config used for reports/ below
 python train.py --steps 100 --eval-interval 50 # quick smoke run (~seconds on CPU)
-pytest -q                                       # 8 tests, incl. causal-mask verification
+pytest -q                                       # 12 tests, incl. causal-mask + API tests
 ```
 
 ### Web playground (React + Tailwind + FastAPI)
@@ -94,6 +94,11 @@ The committed `web/dist/` and `web_model/gpt.pt` mean `uvicorn api:app` works st
 python build_web_model.py         # retrains a compact model -> web_model/gpt.pt
 cd web && npm install && npm run build
 ```
+
+`api.py` restricts CORS to an allowlist read from the `ALLOWED_ORIGINS` env var
+(comma-separated origins). It defaults to `http://localhost:5173,http://localhost:8000`
+(the Vite dev server and the FastAPI-served build), so local dev works with no env
+set; set `ALLOWED_ORIGINS` to override it for other deployments.
 
 ## Results
 
@@ -124,7 +129,7 @@ From a random-character start, the model has learned **the structure of a Shakes
 
 ### Correctness: the causal-mask test
 
-The most important test (`tests/test_minigpt.py::test_causal_mask_no_future_leakage`) proves the model never peeks at the future: it changes the **last** input token and asserts the logits at every **earlier** position are byte-for-byte unchanged, while the last position's logits *do* change. If a transformer fails this, it's secretly cheating during training and useless for generation. Other tests cover softmax weights summing to 1, weight tying, next-token target alignment, and the model overfitting a single batch.
+The most important test (`tests/test_minigpt.py::test_causal_mask_no_future_leakage`) proves the model never peeks at the future: it changes the **last** input token and asserts the logits at every **earlier** position are byte-for-byte unchanged, while the last position's logits *do* change. If a transformer fails this, it's secretly cheating during training and useless for generation. Other tests cover softmax weights summing to 1, weight tying, next-token target alignment, and the model overfitting a single batch. `tests/test_api.py` covers the FastAPI backend (`/api/info`, `/api/generate`, CORS) against the tiny committed `web_model/gpt.pt` bundle — no training or network access in tests.
 
 ## Project structure
 
@@ -139,7 +144,7 @@ api.py             # FastAPI backend: loads web_model/gpt.pt, serves /api/*, ser
 web/               # React + Tailwind + Vite frontend (web/dist is committed, pre-built)
 data/input.txt     # tiny-shakespeare corpus (public domain)
 reports/           # committed training artifacts (loss curve, sample text, metrics)
-tests/             # 8 tests incl. causal-masking verification
+tests/             # 12 tests incl. causal-masking verification and API tests
 ```
 
 ## Key design decisions
@@ -154,16 +159,14 @@ tests/             # 8 tests incl. causal-masking verification
 
 - This is a toy/educational model: ~0.8M parameters, char-level, CPU-trained for a few thousand steps. Output is Shakespeare-*shaped*, not coherent English.
 - No learning-rate schedule or gradient clipping in `train.py` — a flat `3e-4` AdamW run.
-- `api.py` has permissive CORS (`allow_origins=["*"]`) and no rate limiting — fine for local/demo use, not for public deployment as-is.
-- No CI: the test suite (`pytest -q`) must currently be run manually.
-- `train.py` / `api.py` / `build_web_model.py` import via `from src.minigpt import ...`, which relies on being run from the repo root rather than the installed `minigpt` package — works as documented above, but is more fragile than importing the installed package directly.
+- `api.py` restricts CORS to an allowlist (`ALLOWED_ORIGINS`, see above) but still has no rate limiting or auth — fine for local/demo use, not for public deployment as-is.
 
 ## Roadmap
 
-- [ ] GitHub Actions CI running the test suite on push/PR.
+- [x] GitHub Actions CI running the test suite on push/PR.
 - [ ] Gradient clipping + LR warmup/decay for more stable training curves.
-- [ ] Harden `api.py` for anything beyond local demo use (restricted CORS, rate limits, proper HTTP error codes).
-- [ ] Extend tests to cover `api.py`'s endpoints via FastAPI's `TestClient`.
+- [ ] Rate limiting and proper HTTP error codes for `api.py`, beyond the restricted-CORS allowlist already in place.
+- [x] Extend tests to cover `api.py`'s endpoints via FastAPI's `TestClient`.
 - [ ] Optional BPE tokenizer as an alternative to character-level, to compare sample quality at similar parameter counts.
 
 ## License

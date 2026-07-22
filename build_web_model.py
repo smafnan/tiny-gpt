@@ -14,7 +14,7 @@ from pathlib import Path
 
 import torch
 
-from src.minigpt import GPT, GPTConfig, CharDataset, load_text
+from minigpt import GPT, GPTConfig, CharDataset, load_text
 
 STEPS = 1500
 BLOCK = 64

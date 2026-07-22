@@ -9,6 +9,7 @@ Run:  uvicorn api:app --reload  →  http://localhost:8000
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import torch
@@ -17,13 +18,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from src.minigpt import GPT, GPTConfig, CharTokenizer
+from minigpt import GPT, GPTConfig, CharTokenizer
 
 ROOT = Path(__file__).resolve().parent
 BUNDLE = ROOT / "web_model" / "gpt.pt"
 
 app = FastAPI(title="Tiny GPT API", version="1.0.0")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
+
+# Allowed origins for the web playground; comma-separated, defaults cover local dev
+# (Vite dev server + the FastAPI-served build) so `uvicorn api:app` works with no env set.
+_default_origins = "http://localhost:5173,http://localhost:8000"
+_allowed_origins = [
+    o.strip() for o in os.environ.get("ALLOWED_ORIGINS", _default_origins).split(",")
+    if o.strip()
+]
+app.add_middleware(CORSMiddleware, allow_origins=_allowed_origins, allow_methods=["*"],
                    allow_headers=["*"])
 
 _model: GPT | None = None

@@ -20,7 +20,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import torch
 
-from src.minigpt import GPT, GPTConfig, CharDataset, load_text
+from minigpt import GPT, GPTConfig, CharDataset, load_text
 
 
 @torch.no_grad()
